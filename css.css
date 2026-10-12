@@ -1,0 +1,31 @@
+header{
+    background-color: chocolate;
+    color:blanchedalmond;
+    padding: 30px;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+main{
+    padding: 120px;
+    background-color: bisque;
+    color: darkorchid;
+}
+
+img{
+    height: 300px;
+    float: right;
+}
+
+table,th,td{
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 10px;
+    text-align: center;
+}
+
+footer{
+    background-color:sienna;
+    color:wheat;
+    text-align: center;
+    padding: 140px;
+}

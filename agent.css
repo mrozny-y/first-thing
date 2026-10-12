@@ -1,0 +1,7 @@
+.block{
+    width: 300px;
+    background-color:yellowgreen;
+    color: teal;
+    padding: 20px;
+    border: 5px solid black;
+}
