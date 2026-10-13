@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>WebQuiz — HTML & CSS</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1020;--panel:#141c30;--border:#293650;--text:#edf2ff;--muted:#99a8c3;--accent:#8b7cff;--green:#47d7a0}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#20264a 0,transparent 55%),var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,sans-serif;display:grid;place-items:center;padding:24px}
+button{font:inherit;cursor:pointer}
+.app{width:100%;max-width:720px}
+.brand{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:24px}
+.logo{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:linear-gradient(135deg,#a69aff,#6654e8);font-weight:900;font-size:20px;box-shadow:0 8px 30px #6654e844}
+h1{font-size:25px;line-height:1.2;margin:0;letter-spacing:-.7px}
+.brand p{margin:4px 0 0;color:var(--muted);font-size:13px}
+.card{background:linear-gradient(145deg,#171f35,#11182a);border:1px solid var(--border);border-radius:24px;padding:clamp(22px,5vw,40px);box-shadow:0 24px 70px #0004}
+.eyebrow{color:#b1a6ff;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+h2{font-size:clamp(23px,4vw,31px);line-height:1.35;letter-spacing:-.6px;margin:12px 0 26px}
+.muted{color:var(--muted)}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:24px 0}
+.pill{background:#202a42;border:1px solid #303c57;border-radius:100px;padding:7px 13px;font-size:13px;color:#c7d0e6}
+.btn{border:0;border-radius:13px;padding:14px 20px;font-weight:750;transition:transform .15s,filter .15s}
+.btn:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.primary{background:linear-gradient(135deg,#a69aff,#7765f1);color:white;box-shadow:0 7px 24px #7968f133}
+.full{width:100%}
+.progress-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px;font-size:13px;color:var(--muted)}
+.progress{height:7px;background:#27314a;border-radius:99px;overflow:hidden;margin-bottom:30px}
+.progress span{display:block;height:100%;width:0;background:linear-gradient(90deg,#7666ed,#b0a5ff);border-radius:99px;transition:width .3s}
+.answers{display:grid;gap:12px}
+.answer{display:flex;align-items:center;gap:14px;width:100%;padding:15px;text-align:left;border:1px solid var(--border);border-radius:14px;background:#192238;color:var(--text);transition:border-color .15s,background .15s}
+.answer:hover:not(:disabled){border-color:#9284ff;background:#232b48}
+.letter{flex:0 0 35px;height:35px;display:grid;place-items:center;border:1px solid #3b4965;border-radius:10px;color:#bcb2ff;font-weight:800}
+.answer.correct{border-color:var(--green);background:#15372f}
+.answer.correct .letter{border-color:var(--green);color:var(--green)}
+.answer.wrong{border-color:#ff7c91;background:#3a202f}
+.answer.wrong .letter{border-color:#ff7c91;color:#ff9cac}
+.answer:disabled{cursor:default}
+.feedback{min-height:28px;margin:15px 0 12px;font-size:14px;font-weight:650}
+.feedback.good{color:var(--green)}
+.feedback.bad{color:#ff9cac}
+.hidden{display:none!important}
+.result{text-align:center}
+.result-icon{width:90px;height:90px;border-radius:28px;background:#28234b;border:1px solid #51468b;display:grid;place-items:center;margin:20px auto;font-size:40px}
+.score{font-size:66px;font-weight:900;line-height:1.2;letter-spacing:-3px}
+.grade{font-size:19px;color:#b7adff;font-weight:750;margin:8px 0 20px}
+.result p{color:var(--muted)}
+.divider{height:1px;background:var(--border);margin:25px 0}
+.small{font-size:13px;color:var(--muted)}
+@media(max-width:480px){body{padding:15px}.brand{margin-bottom:18px}.card{border-radius:19px;padding:22px 18px}.answer{padding:12px}.score{font-size:56px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="brand">
+<div class="logo">&lt;/&gt;</div>
+<div><h1>WebQuiz</h1><p>HTML & CSS · Sprawdź swoją wiedzę</p></div>
+</header>
+
+<section class="card" id="intro">
+<div class="eyebrow">Quiz informatyczny</div>
+<h2>Jak dobrze znasz HTML i CSS?</h2>
+<p class="muted">Sprawdź swoje umiejętności w krótkim teście przygotowanym dla uczniów technikum.</p>
+<div class="stats">
+<span class="pill">◈ 25 pytań w bazie</span>
+<span class="pill">↗ 10 pytań na rundę</span>
+<span class="pill">◷ Bez limitu czasu</span>
+</div>
+<button class="btn primary full" id="start">Rozpocznij quiz&nbsp; →</button>
+</section>
+
+<section class="card hidden" id="game">
+<div class="progress-head"><span id="counter">Pytanie 1 z 10</span><span id="topic" class="eyebrow">HTML</span></div>
+<div class="progress"><span id="bar"></span></div>
+<h2 id="question"></h2>
+<div class="answers" id="answers"></div>
+<div id="feedback" class="feedback" aria-live="polite"></div>
+<button id="next" class="btn primary full hidden">Następne pytanie&nbsp; →</button>
+</section>
+
+<section class="card result hidden" id="result" aria-live="polite">
+<div class="eyebrow">Quiz zakończony</div>
+<div class="result-icon" id="resultIcon">🏆</div>
+<div class="score"><span id="score">0</span><span class="muted">/10</span></div>
+<div class="grade" id="grade">Ocena: 1</div>
+<h2 id="resultTitle">Dobra robota!</h2>
+<p id="resultText"></p>
+<div class="divider"></div>
+<p class="small" id="details"></p>
+<button class="btn primary full" id="again">↻ Zagraj ponownie</button>
+</section>
+<p class="small" style="text-align:center;margin-top:20px">HTML + CSS · Wiedza w praktyce</p>
+</main>
+
+<script>
+const questions=[
+{t:"HTML",q:"Do czego służy HTML?",a:["Do tworzenia struktury strony","Do stylizowania elementów","Do zarządzania bazą danych","Do animacji 3D"],c:0},
+{t:"HTML",q:"Który znacznik tworzy największy nagłówek?",a:["<heading>","<h6>","<h1>","<head>"],c:2},
+{t:"HTML",q:"Który znacznik tworzy hiperłącze?",a:["<link>","<a>","<href>","<url>"],c:1},
+{t:"HTML",q:"Który atrybut obrazu określa jego źródło?",a:["href","src","alt","link"],c:1},
+{t:"HTML",q:"Który znacznik tworzy akapit?",a:["<text>","<paragraph>","<p>","<section>"],c:2},
+{t:"HTML",q:"Jak zapisać komentarz w HTML?",a:["// komentarz","/* komentarz */","# komentarz","<!-- komentarz -->"],c:3},
+{t:"HTML",q:"Który znacznik tworzy listę uporządkowaną?",a:["<ul>","<ol>","<li>","<dl>"],c:1},
+{t:"HTML",q:"Jaki atrybut określa tekst alternatywny obrazu?",a:["title","name","alt","aria"],c:2},
+{t:"HTML",q:"Który znacznik definiuje komórkę nagłówkową tabeli?",a:["<td>","<tr>","<th>","<thead>"],c:2},
+{t:"HTML",q:"Który znacznik tworzy pole tekstowe w formularzu?",a:["<input type=\"text\">","<textbox>","<text>","<field>"],c:0},
+{t:"HTML",q:"Który element zawiera metadane dokumentu?",a:["<body>","<main>","<footer>","<head>"],c:3},
+{t:"HTML",q:"Jak ustawić kodowanie UTF-8?",a:["<meta charset=\"UTF-8\">","<encoding>UTF-8</encoding>","<html charset=\"UTF-8\">","<meta lang=\"UTF-8\">"],c:0},
+{t:"HTML",q:"Który znacznik osadza plik wideo?",a:["<media>","<video>","<movie>","<play>"],c:1},
+{t:"HTML",q:"Co oznacza semantyczny znacznik <nav>?",a:["Nawigację","Nagłówek strony","Treść artykułu","Stopkę"],c:0},
+{t:"HTML",q:"Jaki atrybut pola formularza wymusza jego wypełnienie?",a:["validate","checked","required","placeholder"],c:2},
+{t:"CSS",q:"Do czego służy CSS?",a:["Do stylizacji stron","Do tworzenia baz danych","Do struktury dokumentu","Do obsługi serwera"],c:0},
+{t:"CSS",q:"Jak zapisać selektor klasy o nazwie box?",a:["#box","box","*box",".box"],c:3},
+{t:"CSS",q:"Jak zapisać selektor identyfikatora o nazwie menu?",a:[".menu","menu","#menu","@menu"],c:2},
+{t:"CSS",q:"Która właściwość zmienia kolor tekstu?",a:["font-color","text-color","color","background"],c:2},
+{t:"CSS",q:"Która właściwość zmienia kolor tła?",a:["background-color","color-background","bg","fill"],c:0},
+{t:"CSS",q:"Jak ustawić tekst na środku?",a:["text-align:center;","align:center;","font-align:center;","position:center;"],c:0},
+{t:"CSS",q:"Która właściwość ustala rozmiar czcionki?",a:["text-size","font-size","size","font-style"],c:1},
+{t:"CSS",q:"Co robi display: flex?",a:["Ukrywa element","Zmienia kolor tekstu","Włącza układ elastyczny","Dodaje cień"],c:2},
+{t:"CSS",q:"Która właściwość ustawia margines zewnętrzny?",a:["padding","border","spacing","margin"],c:3},
+{t:"CSS",q:"Jak zaokrąglić rogi elementu?",a:["corner-radius","border-radius","round","border-style"],c:1}
+];
+
+const $=id=>document.getElementById(id);
+let round=[],index=0,score=0,locked=false,stats={HTML:0,CSS:0};
+function shuffle(arr){
+const a=[...arr];
+for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}
+return a;
+}
+function start(){
+round=shuffle(questions).slice(0,10);
+index=0;score=0;locked=false;stats={HTML:0,CSS:0};
+$("intro").classList.add("hidden");
+$("result").classList.add("hidden");
+$("game").classList.remove("hidden");
+render();
+}
+function render(){
+locked=false;
+const item=round[index];
+$("counter").textContent=`Pytanie ${index+1} z 10`;
+$("topic").textContent=item.t;
+$("bar").style.width=`${index*10}%`;
+$("question").textContent=item.q;
+$("feedback").textContent="";
+$("feedback").className="feedback";
+$("next").classList.add("hidden");
+$("answers").replaceChildren();
+item.a.forEach((answer,i)=>{
+const button=document.createElement("button");
+button.className="answer";
+const letter=document.createElement("span");
+letter.className="letter";
+letter.textContent="ABCD"[i];
+const label=document.createElement("span");
+label.textContent=answer;
+button.append(letter,label);
+button.addEventListener("click",()=>choose(i));
+$("answers").append(button);
+});
+}
+function choose(choice){
+if(locked)return;
+locked=true;
+const item=round[index];
+const buttons=[...$("answers").children];
+buttons.forEach((button,i)=>{
+button.disabled=true;
+if(i===item.c)button.classList.add("correct");
+if(i===choice&&i!==item.c)button.classList.add("wrong");
+});
+if(choice===item.c){
+score++;
+stats[item.t]++;
+$("feedback").textContent="✓ Poprawna odpowiedź!";
+$("feedback").classList.add("good");
+}else{
+$("feedback").textContent="✕ Niepoprawnie. "+item.a[item.c];
+$("feedback").classList.add("bad");
+}
+$("bar").style.width=`${(index+1)*10}%`;
+$("next").textContent=index===9?"Zobacz wynik →":"Następne pytanie →";
+$("next").classList.remove("hidden");
+}
+function finish(){
+$("game").classList.add("hidden");
+$("result").classList.remove("hidden");
+const grade=score<=4?1:score===5?2:score===6?3:score<=8?4:score===9?5:6;
+$("score").textContent=score;
+$("grade").textContent=`Ocena: ${grade}`;
+$("resultIcon").textContent=score<=4?"📚":score<=6?"💡":score<=8?"🚀":"🏆";
+$("resultTitle").textContent=score<=4?"Czas na powtórkę!":score<=6?"Dobry początek!":score<=8?"Świetny wynik!":"Mistrz kodowania!";
+$("resultText").textContent=score<=4?"Powtórz podstawy HTML i CSS, a potem spróbuj ponownie.":score<=6?"Znasz już część podstaw. Kilka powtórek pomoże Ci zdobyć więcej punktów.":score<=8?"Bardzo dobrze! Masz solidną wiedzę o tworzeniu stron.":"Gratulacje! Świetnie znasz podstawy HTML i CSS.";
+$("details").textContent=`HTML: ${stats.HTML}/15 możliwych pytań w bazie · CSS: ${stats.CSS}/10 możliwych pytań w bazie`;
+}
+$("start").addEventListener("click",start);
+$("again").addEventListener("click",start);
+$("next").addEventListener("click",()=>{
+if(!locked)return;
+if(index===9)finish();
+else{index++;render()}
+});
+</script>
+</body>
+</html>
